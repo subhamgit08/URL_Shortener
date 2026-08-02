@@ -49,7 +49,7 @@ export default function UrlShortener() {
 
         try {
             // Send urlContent to the backend API
-            const response = await axios.post("http://localhost:3000/api/url/make-url", {
+            const response = await axios.post("https://url-shortener-s5p8.onrender.com/api/url/make-url", {
                 longURL: urlContent
             },
 

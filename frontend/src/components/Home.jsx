@@ -94,7 +94,7 @@ export default function HomePage() {
         <div className="min-h-screen bg-[#0a0a0a] text-neutral-200 font-sans selection:bg-blue-500/30 overflow-hidden relative pb-24">
 
             {/* Background Glow Effect */}
-            <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-200 h-125 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-6 pt-32 md:pt-48 relative z-10">
 
@@ -110,7 +110,7 @@ export default function HomePage() {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                         </span>
-                        v2.0 is now live
+                        v1.0 is now live
                     </motion.div>
 
                     <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1]">
