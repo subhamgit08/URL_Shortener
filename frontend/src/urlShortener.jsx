@@ -16,22 +16,8 @@ import {
     Link as LinkIcon,
     AutoAwesome
 } from '@mui/icons-material';
-
-// --- Logic Ported from Vanilla JS ---
-const setOfIDs = new Set();
-
-export function shortenerOfID(id) {
-    const container = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let n = id;
-    let convertedString = "";
-    if (n === 0) return container[0];
-    while (n > 0) {
-        let rem = n % 62;
-        convertedString = container[rem] + convertedString;
-        n = Math.floor(n / 62);
-    }
-    return convertedString;
-}
+import axios from 'axios';
+import { useAuth } from '@clerk/react';
 
 // --- Modern React UI Component ---
 export default function UrlShortener() {
@@ -40,8 +26,17 @@ export default function UrlShortener() {
     const [result, setResult] = useState(null);
     const [isCopied, setIsCopied] = useState(false);
 
-    const handleSubmit = (e) => {
+    const { getToken, isLoaded, isSignedIn } = useAuth();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const token = await getToken();
+        console.log(token)
+        console.log({
+            isLoaded,
+            isSignedIn,
+            token: await getToken(),
+        });
         const urlContent = longUrl.trim();
         if (!urlContent) return;
 
@@ -49,23 +44,49 @@ export default function UrlShortener() {
         setResult(null); // Clear previous result if any
         setIsCopied(false);
 
-        // Simulate backend processing time
-        setTimeout(() => {
-            let newID;
-            do {
-                newID = Math.floor(Math.random() * 2000);
-            } while (setOfIDs.has(newID));
+        if (!isLoaded || !isSignedIn) return;
 
-            setOfIDs.add(newID);
-            const encryptedID = shortenerOfID(newID);
-            const trimmedLink = `https://snap-URL.com/${encryptedID}`;
 
-            setResult({ original: urlContent, shortened: trimmedLink });
-            setIsLoading(false);
+        try {
+            // Send urlContent to the backend API
+            const response = await axios.post("http://localhost:3000/api/url/make-url", {
+                longURL: urlContent
+            },
+
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            console.log(response.data);
+
+            // Update state with the backend response data
+            // Adjust response.data properties if your backend returns different field names
+            setResult({
+                original: urlContent,
+                shortened: response.data.data.shortURL
+            });
+
             setLongUrl('');
-            console.log([...setOfIDs]);
-        }, 800); // Slightly longer delay for a smoother loading animation
+        } catch (error) {
+            console.error(error);
+
+            if (error.response) {
+                console.log("Status:", error.response.status);
+                console.log("Data:", error.response.data);
+            } else if (error.request) {
+                console.log("No response from server");
+            } else {
+                console.log(error.message);
+            }
+            // Optional: Set an error state here to show a message to the user
+        } finally {
+            setIsLoading(false);
+        }
     };
+
 
     const handleCopy = () => {
         if (result?.shortened) {
@@ -140,15 +161,26 @@ export default function UrlShortener() {
                                     color: "#666", // Default label color
                                 },
                                 "& .MuiInputLabel-root.Mui-focused": {
-                                    color: "#7f0acd", // Label color when input is focused
+                                    color: "#5e0a95", // Label color when input is focused
                                 },
                                 "& .MuiInputLabel-root:hover": {
-                                    color: "#7f0acd", // Label color when hovering (optional)
+                                    color: "#5e0a95", // Label color when hovering (optional)
                                 },
 
                                 "& .MuiFilledInput-root": {
                                     backgroundColor: "#fff",
                                     borderRadius: "16px",
+
+                                    "& input:-webkit-autofill": {
+                                        WebkitBoxShadow: "0 0 0 100px #fff inset",
+                                        WebkitTextFillColor: "#000",
+                                        caretColor: "#000",
+                                        borderRadius: "inherit",
+                                    },
+                                    "& input:-webkit-autofill:hover, & input:-webkit-autofill:focus": {
+                                        WebkitBoxShadow: "0 0 0 100px #fff inset",
+                                        WebkitTextFillColor: "#000",
+                                    },
 
                                     "&:hover": {
                                         backgroundColor: "#fff",
