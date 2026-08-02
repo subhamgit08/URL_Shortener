@@ -102,75 +102,76 @@ export function AnimatedNavFramer() {
 
   return (
     <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3">
-      
-      <Show when="signed-in">
-        <motion.nav
-          initial={{ y: -80, opacity: 0 }}
-          animate={isExpanded ? "expanded" : "collapsed"}
-          variants={containerVariants}
-          whileHover={!isExpanded ? { scale: 1.05 } : {}}
-          whileTap={!isExpanded ? { scale: 0.95 } : {}}
-          onClick={handleNavClick}
+
+      {/* ALWAYS SHOW NAVIGATION BAR */}
+      <motion.nav
+        initial={{ y: -80, opacity: 0 }}
+        animate={isExpanded ? "expanded" : "collapsed"}
+        variants={containerVariants}
+        whileHover={!isExpanded ? { scale: 1.05 } : {}}
+        whileTap={!isExpanded ? { scale: 0.95 } : {}}
+        onClick={handleNavClick}
+        className={cn(
+          "relative flex items-center overflow-hidden rounded-full border border-neutral-800/80 bg-neutral-900/60 shadow-lg shadow-black/50 backdrop-blur-xl h-12 text-white",
+          !isExpanded && "cursor-pointer justify-center hover:border-neutral-700 hover:bg-neutral-800/80 transition-colors"
+        )}
+      >
+        {/* Logo / Brand Icon */}
+        <motion.div
+          variants={logoVariants}
+          className="shrink-0 flex items-center font-semibold pl-4 pr-2 text-white"
+        >
+          <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-400">
+            <Navigation className="h-4 w-4" />
+          </div>
+        </motion.div>
+
+        {/* Navigation Links */}
+        <motion.div
           className={cn(
-            "relative flex items-center overflow-hidden rounded-full border border-neutral-800/80 bg-neutral-900/60 shadow-lg shadow-black/50 backdrop-blur-xl h-12 text-white",
-            !isExpanded && "cursor-pointer justify-center hover:border-neutral-700 hover:bg-neutral-800/80 transition-colors"
+            "flex items-center gap-1 sm:gap-2 pr-4",
+            !isExpanded && "pointer-events-none"
           )}
         >
-          {/* Logo / Brand Icon */}
-          <motion.div
-            variants={logoVariants}
-            className="shrink-0 flex items-center font-semibold pl-4 pr-2 text-white"
-          >
-            <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-400">
-              <Navigation className="h-4 w-4" />
-            </div>
-          </motion.div>
-
-          {/* Navigation Links */}
-          <motion.div
-            className={cn(
-              "flex items-center gap-1 sm:gap-2 pr-4",
-              !isExpanded && "pointer-events-none"
-            )}
-          >
-            {navItems.map((item) => (
-              <MotionLink
-                key={item.name}
-                to={item.href}
-                variants={itemVariants}
-                onClick={(e) => e.stopPropagation()}
-                className="text-sm font-medium text-neutral-400 hover:text-blue-400 hover:bg-white/5 transition-all px-3 py-1.5 rounded-full block"
-              >
-                {item.name}
-              </MotionLink>
-            ))}
-          </motion.div>
-
-          {/* Collapsed Menu Icon */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <motion.div
-              variants={collapsedIconVariants}
-              animate={isExpanded ? "expanded" : "collapsed"}
-              className="text-neutral-400"
+          {navItems.map((item) => (
+            <MotionLink
+              key={item.name}
+              to={item.href}
+              variants={itemVariants}
+              onClick={(e) => e.stopPropagation()}
+              className="text-sm font-medium text-neutral-400 hover:text-blue-400 hover:bg-white/5 transition-all px-3 py-1.5 rounded-full block"
             >
-              <Menu className="h-5 w-5" />
-            </motion.div>
-          </div>
-        </motion.nav>
+              {item.name}
+            </MotionLink>
+          ))}
+        </motion.div>
 
-        {/* User Avatar - Wrapped in matching glassmorphism */}
+        {/* Collapsed Menu Icon */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <motion.div
+            variants={collapsedIconVariants}
+            animate={isExpanded ? "expanded" : "collapsed"}
+            className="text-neutral-400"
+          >
+            <Menu className="h-5 w-5" />
+          </motion.div>
+        </div>
+      </motion.nav>
+
+      {/* CONDITIONALLY SHOW AVATAR (LOGGED IN) */}
+      <Show when="signed-in">
         <div className="shrink-0 flex items-center justify-center h-12 w-12 rounded-full border border-neutral-800/80 bg-neutral-900/60 backdrop-blur-xl shadow-lg">
-          <UserButton 
-            afterSignOutUrl="/" 
-            appearance={{ 
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
               elements: { userButtonAvatarBox: "h-8 w-8" },
-            }} 
+            }}
           />
         </div>
       </Show>
 
+      {/* CONDITIONALLY SHOW REGISTER BUTTON (LOGGED OUT) */}
       <Show when="signed-out">
-        {/* Styled Container for Register state */}
         <div className="flex items-center rounded-full border border-neutral-800/80 bg-neutral-900/60 p-1.5 backdrop-blur-xl shadow-lg">
           <SignUpButton mode="modal">
             <button className="px-6 py-2 rounded-full font-medium text-sm bg-white text-black hover:bg-blue-500 hover:text-white transition-colors duration-300">
