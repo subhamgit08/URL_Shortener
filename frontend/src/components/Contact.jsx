@@ -39,7 +39,7 @@ const contactLinks = [
   },
   {
     name: "WhatsApp",
-    url: "https://wa.me/9903620778",
+    url: "https://wa.me/919903620778",
     handle: "+91 9903620778",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
