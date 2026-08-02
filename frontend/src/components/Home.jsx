@@ -121,7 +121,7 @@ export default function HomePage() {
                     </motion.h1>
 
                     <motion.p variants={fadeUp} className="text-lg md:text-xl text-neutral-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-                        The minimal, lightning-fast URL shortener designed for modern teams. Create custom links, track performance, and scale your brand.
+                        The minimal, lightning-fast URL shortener designed for modern teams. Create shorter links and scale your brand.
                     </motion.p>
 
                     <motion.div variants={fadeUp} className="flex justify-center">

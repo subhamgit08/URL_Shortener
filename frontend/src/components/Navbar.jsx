@@ -1,12 +1,9 @@
-"use client";
-
 import * as React from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { Navigation, Menu } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Link } from "react-router-dom";
 import { Show, SignUpButton, UserButton } from "@clerk/react";
-import { dark } from "@clerk/themes";
 
 const MotionLink = motion.create(Link);
 
@@ -36,7 +33,7 @@ const containerVariants = {
   collapsed: {
     y: 0,
     opacity: 1,
-    width: "3rem",
+    width: "3rem", // Matches the compact h-12 height
     transition: {
       type: "spring",
       damping: 20,
@@ -101,8 +98,9 @@ export function AnimatedNavFramer() {
   };
 
   return (
-    <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3">
-
+    // RESPONSIVE FIX: Changed top-8 to top-4 sm:top-8, gap-3 to gap-2 sm:gap-3, and added max-w-[95vw]
+    <div className="fixed top-4 sm:top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 sm:gap-3 w-[max-content] max-w-[95vw]">
+      
       {/* ALWAYS SHOW NAVIGATION BAR */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
@@ -112,14 +110,14 @@ export function AnimatedNavFramer() {
         whileTap={!isExpanded ? { scale: 0.95 } : {}}
         onClick={handleNavClick}
         className={cn(
-          "relative flex items-center overflow-hidden rounded-full border border-neutral-800/80 bg-neutral-900/60 shadow-lg shadow-black/50 backdrop-blur-xl h-12 text-white",
+          "relative flex items-center overflow-hidden rounded-full border border-neutral-800/80 bg-neutral-900/60 shadow-lg shadow-black/50 backdrop-blur-xl h-12 text-white shrink-0",
           !isExpanded && "cursor-pointer justify-center hover:border-neutral-700 hover:bg-neutral-800/80 transition-colors"
         )}
       >
         {/* Logo / Brand Icon */}
         <motion.div
           variants={logoVariants}
-          className="shrink-0 flex items-center font-semibold pl-4 pr-2 text-white"
+          className="shrink-0 flex items-center font-semibold pl-3 sm:pl-4 pr-1 sm:pr-2 text-white"
         >
           <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-400">
             <Navigation className="h-4 w-4" />
@@ -129,7 +127,7 @@ export function AnimatedNavFramer() {
         {/* Navigation Links */}
         <motion.div
           className={cn(
-            "flex items-center gap-1 sm:gap-2 pr-4",
+            "flex items-center gap-0.5 sm:gap-1 pr-3 sm:pr-4",
             !isExpanded && "pointer-events-none"
           )}
         >
@@ -139,7 +137,8 @@ export function AnimatedNavFramer() {
               to={item.href}
               variants={itemVariants}
               onClick={(e) => e.stopPropagation()}
-              className="text-sm font-medium text-neutral-400 hover:text-blue-400 hover:bg-white/5 transition-all px-3 py-1.5 rounded-full block"
+              // RESPONSIVE FIX: Smaller text and padding on mobile
+              className="text-xs sm:text-sm font-medium text-neutral-400 hover:text-blue-400 hover:bg-white/5 transition-all px-2.5 sm:px-3 py-1.5 rounded-full block whitespace-nowrap"
             >
               {item.name}
             </MotionLink>
@@ -161,20 +160,21 @@ export function AnimatedNavFramer() {
       {/* CONDITIONALLY SHOW AVATAR (LOGGED IN) */}
       <Show when="signed-in">
         <div className="shrink-0 flex items-center justify-center h-12 w-12 rounded-full border border-neutral-800/80 bg-neutral-900/60 backdrop-blur-xl shadow-lg">
-          <UserButton
-            afterSignOutUrl="/"
-            appearance={{
+          <UserButton 
+            afterSignOutUrl="/" 
+            appearance={{ 
               elements: { userButtonAvatarBox: "h-8 w-8" },
-            }}
+            }} 
           />
         </div>
       </Show>
 
       {/* CONDITIONALLY SHOW REGISTER BUTTON (LOGGED OUT) */}
       <Show when="signed-out">
-        <div className="flex items-center rounded-full border border-neutral-800/80 bg-neutral-900/60 p-1.5 backdrop-blur-xl shadow-lg">
+        {/* RESPONSIVE FIX: Adjusted padding and font size for mobile */}
+        <div className="shrink-0 flex items-center rounded-full border border-neutral-800/80 bg-neutral-900/60 p-1 sm:p-1.5 backdrop-blur-xl shadow-lg">
           <SignUpButton mode="modal">
-            <button className="px-6 py-2 rounded-full font-medium text-sm bg-white text-black hover:bg-blue-500 hover:text-white transition-colors duration-300">
+            <button className="px-4 py-1.5 sm:px-6 sm:py-2 rounded-full font-medium text-xs sm:text-sm bg-white text-black hover:bg-blue-500 hover:text-white transition-colors duration-300 whitespace-nowrap">
               Register
             </button>
           </SignUpButton>
