@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express"
-import Webhook from "svix"
+import {Webhook} from "svix"
 import User from "../models/user.js"
 
 
