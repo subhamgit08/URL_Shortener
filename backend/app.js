@@ -37,7 +37,7 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use("/api", express.raw({ type: "application/json" }), webhookRoutes);
+app.use("/api/webhooks", express.raw({ type: "application/json" }), webhookRoutes);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
