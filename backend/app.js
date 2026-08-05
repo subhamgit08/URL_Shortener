@@ -13,8 +13,27 @@ import webhookRoutes from "./routes/webHooks_routes.js";
 
 const app = express();
 
+// app.use(cors({
+//     origin: process.env.CLIENT_URL,
+//     credentials: true,
+// }));
+
+const allowedOrigins = [
+  "http://localhost:5173", 
+  "https://url-shortener-frontend-omega-sooty.vercel.app"
+];
+
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, curl, or Clerk webhooks)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Blocked by CORS policy"));
+        }
+    },
     credentials: true,
 }));
 
