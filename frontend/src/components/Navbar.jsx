@@ -3,7 +3,8 @@ import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { Navigation, Menu } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Link } from "react-router-dom";
-import { Show, SignUpButton, UserButton } from "@clerk/react";
+import { Show, SignUpButton, useAuth, UserButton } from "@clerk/react";
+import axios from "axios";
 
 const MotionLink = motion.create(Link);
 
@@ -71,6 +72,32 @@ const collapsedIconVariants = {
 
 export function AnimatedNavFramer() {
   const [isExpanded, setExpanded] = React.useState(true);
+  const [userPlan, setUserPlan] = React.useState("free");
+
+  const { isSignedIn, getToken } = useAuth();
+
+  React.useEffect(() => {
+    async function fetchPlan() {
+      if (!isSignedIn) return;
+      try {
+        const token = await getToken();
+        console.log(token);
+        
+        const backendUrl = import.meta.env.VITE_BACKEND_ENDPOINT || "http://localhost:3000";
+        const response = await axios.get(`${backendUrl}/api/user/getPlan`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        console.log(response.data);
+        if (response.data?.plan) {
+          setUserPlan(response.data.plan);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user plan", err);
+      }
+    }
+    fetchPlan();
+  }, [isSignedIn, getToken]);
 
   const { scrollY } = useScroll();
   const lastScrollY = React.useRef(0);
@@ -97,9 +124,29 @@ export function AnimatedNavFramer() {
     }
   };
 
+  const planConfig = {
+    free: {
+      ring: "ring-2 ring-slate-300 shadow-[0_0_10px_rgba(203,213,225,0.6)]",
+      badgeText: "f",
+      badgeBg: "bg-slate-300 text-slate-900",
+    },
+    pro: {
+      ring: "ring-2 ring-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.7)]",
+      badgeText: "p",
+      badgeBg: "bg-amber-400 text-black font-bold",
+    },
+    premium: {
+      ring: "ring-2 ring-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)]",
+      badgeText: "◆", // Diamond sign containing 'p' layout context
+      badgeBg: "bg-gradient-to-tr from-cyan-500 to-blue-600 text-white font-bold",
+    },
+  };
+
+  const currentPlan = planConfig[userPlan] || planConfig.free;
+
   return (
     // RESPONSIVE FIX: Changed top-8 to top-4 sm:top-8, gap-3 to gap-2 sm:gap-3, and added max-w-[95vw]
-    <div className="fixed top-4 sm:top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 sm:gap-3 w-[max-content] max-w-[95vw]">
+    <div className="fixed top-4 sm:top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 sm:gap-3 w-max max-w-[95vw]">
       
       {/* ALWAYS SHOW NAVIGATION BAR */}
       <motion.nav
@@ -159,13 +206,25 @@ export function AnimatedNavFramer() {
 
       {/* CONDITIONALLY SHOW AVATAR (LOGGED IN) */}
       <Show when="signed-in">
-        <div className="shrink-0 flex items-center justify-center h-12 w-12 rounded-full border border-neutral-800/80 bg-neutral-900/60 backdrop-blur-xl shadow-lg">
-          <UserButton 
-            afterSignOutUrl="/" 
-            appearance={{ 
-              elements: { userButtonAvatarBox: "h-8 w-8" },
-            }} 
-          />
+        <div className="relative shrink-0 flex items-center justify-center h-12 w-12 rounded-full border border-neutral-800/80 bg-neutral-900/60 backdrop-blur-xl shadow-lg">
+          
+          {/* Plan Wrapper Ring */}
+          <div className={cn("rounded-full p-0.5 flex items-center justify-center", currentPlan.ring)}>
+            <UserButton 
+              afterSignOutUrl="/" 
+              appearance={{ 
+                elements: { userButtonAvatarBox: "h-8 w-8" },
+              }} 
+            />
+          </div>
+
+          {/* Bottom-Right Plan Indicator Badge */}
+          <div className={cn(
+            "absolute -bottom-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center text-[10px] shadow-md border border-neutral-900 z-10",
+            currentPlan.badgeBg
+          )}>
+            {userPlan === "premium" ? <span className="text-[9px] tracking-tighter">P♦</span> : currentPlan.badgeText}
+          </div>
         </div>
       </Show>
 
