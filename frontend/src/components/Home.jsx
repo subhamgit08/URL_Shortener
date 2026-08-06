@@ -124,24 +124,25 @@ export default function HomePage() {
                         The minimal, lightning-fast URL shortener designed for modern teams. Create shorter links and scale your brand.
                     </motion.p>
 
-                    <motion.div variants={fadeUp} className="flex justify-center">
+                    {/* --- UPDATED RESPONSIVE BUTTON CONTAINER --- */}
+                    <motion.div variants={fadeUp} className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 w-full max-w-sm md:max-w-none mx-auto">
                         <Show when={"signed-out"}>
                             <SignUpButton mode="modal">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="bg-white text-black hover:bg-blue-500 hover:text-white font-medium text-lg px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_30px_-5px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_0px_rgba(59,130,246,0.6)]"
+                                    className="w-full md:w-auto bg-white text-black hover:bg-blue-500 hover:text-white font-medium text-lg px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_30px_-5px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_0px_rgba(59,130,246,0.6)]"
                                 >
                                     Get Started for Free
                                 </motion.button>
                             </SignUpButton>
                         </Show>
                         <Show when={"signed-in"}>
-                            <Link to={"/url-shortener"}>
+                            <Link to={"/url-shortener"} className="w-full md:w-auto">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="bg-blue-600 text-white hover:bg-blue-500 font-medium text-lg px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_30px_-5px_rgba(59,130,246,0.5)] hover:shadow-[0_0_40px_0px_rgba(59,130,246,0.7)] flex items-center justify-center gap-2"
+                                    className="w-full md:w-auto bg-blue-600 text-white hover:bg-blue-500 font-medium text-lg px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_30px_-5px_rgba(59,130,246,0.5)] hover:shadow-[0_0_40px_0px_rgba(59,130,246,0.7)] flex items-center justify-center gap-2"
                                 >
                                     Let's Shorten your links
                                     <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,6 +151,16 @@ export default function HomePage() {
                                 </motion.button>
                             </Link>
                         </Show>
+
+                        <Link to="/pricing" className="w-full md:w-auto">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="w-full md:w-auto bg-transparent border border-neutral-700 text-white hover:bg-neutral-800 font-medium text-lg px-8 py-4 rounded-full transition-all duration-300"
+                            >
+                                View Plans
+                            </motion.button>
+                        </Link>
                     </motion.div>
                 </motion.section>
 
