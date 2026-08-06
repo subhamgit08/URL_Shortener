@@ -1,16 +1,21 @@
-import dotenv from "dotenv";
-dotenv.config();
-
-import Razorpay from "razorpay"
-import { Router } from 'express'
-import User from "../models/user.js"
+import { Router } from "express";
+import Razorpay from "razorpay";
+import crypto from "crypto";
+import User from "../models/user.js";
 
 const router = Router();
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+// Helper to get Razorpay instance with active environment variables
+const getRazorpayInstance = () => {
+  const key_id = process.env.RAZORPAY_KEY_ID;
+  const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!key_id || !key_secret) {
+    throw new Error("Razorpay API keys are missing in process.env");
+  }
+
+  return new Razorpay({ key_id, key_secret });
+};
 
 router.post("/create-order", async (req, res) => {
   try {
@@ -20,6 +25,8 @@ router.post("/create-order", async (req, res) => {
     if (!amount || amount < 100) {
       return res.status(400).json({ error: "Amount must be at least 100 paise." });
     }
+
+    const razorpay = getRazorpayInstance();
 
     const options = {
       amount: Number(amount), // amount in paise
@@ -36,8 +43,8 @@ router.post("/create-order", async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating Razorpay order:", error);
-    if (error.statusCode === 401) {
-      return res.status(401).json({ error: "Razorpay authentication failed" });
+    if (error.statusCode === 401 || error.message.includes("keys are missing")) {
+      return res.status(401).json({ error: "Razorpay authentication failed. Check API keys in .env" });
     }
     return res.status(500).json({ error: "Failed to create payment order" });
   }
@@ -72,7 +79,7 @@ router.post("/verify-payment", async (req, res) => {
       const updatedUser = await User.findOneAndUpdate(
         { clerkId: clerkId },
         {
-          plan: plan, // Updates from 'free' to 'pro' or 'premium'
+          plan: plan,
           subscription: {
             razorpayOrderId: razorpay_order_id,
             razorpayPaymentId: razorpay_payment_id,
@@ -93,7 +100,6 @@ router.post("/verify-payment", async (req, res) => {
         plan: updatedUser.plan 
       });
     } else {
-      // Signature mismatch - Fraudulent transaction attempt
       return res.status(400).json({ success: false, error: "Invalid payment signature" });
     }
   } catch (error) {
@@ -102,5 +108,46 @@ router.post("/verify-payment", async (req, res) => {
   }
 });
 
+router.post("/set-free-plan", async (req, res) => {
+  try {
+    const { clerkId, plan } = req.body;
+
+    if (!clerkId) {
+      return res.status(400).json({ error: "Missing clerkId" });
+    }
+
+    if (plan !== "free") {
+      return res.status(400).json({ error: "Invalid plan type for this endpoint" });
+    }
+
+    // Update user to free and clear their subscription data
+    const updatedUser = await User.findOneAndUpdate(
+      { clerkId: clerkId },
+      {
+        plan: "free",
+        subscription: {
+          razorpayOrderId: null,
+          razorpayPaymentId: null,
+          planStartDate: null,
+          planExpiryDate: null,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Successfully switched to free plan",
+      plan: updatedUser.plan 
+    });
+  } catch (error) {
+    console.error("Error setting free plan:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 export default router;
