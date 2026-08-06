@@ -10,13 +10,9 @@ import { clerkMiddleware } from "@clerk/express";
 import urlRoutes from "./routes/url_routes.js";
 import payemntRoutes from "./routes/payment_routes.js";
 import webhookRoutes from "./routes/webHooks_routes.js";
+import userRoutes from "./routes/user_routes.js";
 
 const app = express();
-
-// app.use(cors({
-//     origin: process.env.CLIENT_URL,
-//     credentials: true,
-// }));
 
 const allowedOrigins = [
   "http://localhost:5173", 
@@ -56,5 +52,6 @@ app.get("/health", (req, res) => {
 app.use(clerkMiddleware());
 app.use("/api/url", urlRoutes);
 app.use("/api/payment", payemntRoutes);
+app.use("/api/user", userRoutes);
 
 export default app;
