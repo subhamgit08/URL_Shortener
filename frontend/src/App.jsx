@@ -9,6 +9,7 @@ import KineticGrid from './components/Kinetic_Grid'
 import AboutPage from './components/About';
 import ContactPage from './components/Contact';
 import HomePage from './components/Home';
+import Pricing from './components/Pricing';
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/url-shortener" element={<UrlShortener />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/pricing" element={<Pricing />} />
       </Routes>
     </KineticGrid>
   )
