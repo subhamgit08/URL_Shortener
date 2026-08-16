@@ -1,5 +1,5 @@
 import redisClient from "../config/redis.js";
-import URL from "./models/urlSchema.js";
+import URL from "../models/urlSchema.js";
 
 export const syncClicksToDatabase = async () => {
     try {
