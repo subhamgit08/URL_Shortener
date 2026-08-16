@@ -2,6 +2,7 @@ import URL from "../models/urlSchema.js";
 import { getAuth, requireAuth } from "@clerk/express";
 import { encodeBase62 } from "../utils/Base62Converter.js";
 import Counter from "../config/Counter.js";
+import redisClient from "../config/redis.js";
 
 export const make_urls = async (req, res) => {
     try {
@@ -41,6 +42,9 @@ export const make_urls = async (req, res) => {
             shortCode,
         });
 
+        const cacheKey = `url:${shortCode}`;
+        await redisClient.setEx(cacheKey, 86400, longURL);
+
         return res.status(201).json({
             success: true,
             message: "Short URL created successfully.",
@@ -66,6 +70,15 @@ export const redirectURL = async (req, res) => {
     try {
 
         const { shortCode } = req.params;
+        const cacheKey = `url:${shortCode}`;
+
+        await redisClient.hIncrBy("url_clicks", shortCode, 1);
+
+        const cachedLongUrl = await redisClient.get(cacheKey);
+
+        if (cachedLongUrl) {
+            return res.redirect(cachedLongUrl);
+        }
 
         const url = await URL.findOne({ shortCode });
 
@@ -76,9 +89,7 @@ export const redirectURL = async (req, res) => {
             });
         }
 
-        url.clicks++;
-
-        await url.save();
+        await redisClient.setEx(cacheKey, 86400, url.longURL);
 
         return res.redirect(url.longURL);
 
