@@ -9,16 +9,22 @@ export const getUserPlan = async (req, res) => {
       return res.status(401).json({ success:false , error: "Unauthorized" });
     }
 
+    const cacheKey = `plan:${userId}`;
+
+    // 1. Check Cache
+    const cachedPlan = await redisClient.get(cacheKey);
+    if (cachedPlan) {
+        return res.status(200).json({ plan: cachedPlan });
+    }
+
     // Find user in your database by Clerk ID
     const user = await User.findOne({ clerkId: userId, });
 
-    if (!user) {
-      // Default to 'free' plan if user record doesn't exist yet
-      return res.status(200).json({ plan: "free" });
-    }
+    const planToReturn = user ? user.plan : "free";
 
-    // Returns: { plan: "free" | "pro" | "premium" }
-    return res.status(200).json({ plan: user.plan });
+    await redisClient.setEx(cacheKey, 3600, planToReturn);
+
+    return res.status(200).json({ plan: planToReturn });
   } catch (error) {
     console.error("Error fetching user plan:", error);
     return res.status(500).json({ error: "Internal Server Error" });

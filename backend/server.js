@@ -4,12 +4,15 @@ dotenv.config();
 
 import app from "./app.js";
 import {connectDB} from "./config/mongoDB.js";
+import { syncClicksToDatabase } from './controllers/clickSyncer.js';
 
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
     try {
         await connectDB();
+
+        setInterval(syncClicksToDatabase, 5 * 60 * 1000);
 
         app.listen(PORT, () => {
             console.log(`🚀 Server running on http://localhost:${PORT}`);
