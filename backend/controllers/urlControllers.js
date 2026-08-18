@@ -25,6 +25,23 @@ export const make_urls = async (req, res) => {
             })
         }
 
+        const existingUrl = await URL.findOne({
+            userId,
+            longURL
+        });
+
+        if (existingUrl) {
+            return res.status(200).json({
+                success: true,
+                message: "Short URL already exists.",
+                data: {
+                    longURL: existingUrl.longURL,
+                    shortCode: existingUrl.shortCode,
+                    shortURL: `${process.env.BASE_URL}/${existingUrl.shortCode}`,
+                },
+            });
+        }
+
         const counter = await Counter.findByIdAndUpdate(
             "urlCounter",
             { $inc: { sequence: 1 } },
