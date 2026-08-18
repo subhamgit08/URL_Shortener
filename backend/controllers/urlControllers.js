@@ -77,8 +77,10 @@ export const redirectURL = async (req, res) => {
         const cachedLongUrl = await redisClient.get(cacheKey);
 
         if (cachedLongUrl) {
+            console.log("CACHE HIT:", cacheKey);
             return res.redirect(cachedLongUrl);
         }
+        console.log("CACHE MISS:", cacheKey);
 
         const url = await URL.findOne({ shortCode });
 
