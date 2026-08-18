@@ -63,6 +63,7 @@ const contactLinks = [
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const backendUrl = import.meta.env.VITE_BACKEND_ENDPOINT || "http://localhost:3000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,7 +78,7 @@ export default function ContactPage() {
     };
 
     try {
-      const response = await axios.post("http://localhost:3000/api/feedback/send-feedback", formData);
+      const response = await axios.post(`${backendUrl}/api/feedback/send-feedback`, formData);
 
       if (response.data.success) {
         setStatusMessage("Thanks for your feedback! Check your email.");
