@@ -11,6 +11,7 @@ import urlRoutes from "./routes/url_routes.js";
 import payemntRoutes from "./routes/payment_routes.js";
 import webhookRoutes from "./routes/webHooks_routes.js";
 import userRoutes from "./routes/user_routes.js";
+import feedbackRoutes from "./routes/feedback.js";
 
 const app = express();
 
@@ -53,5 +54,6 @@ app.use(clerkMiddleware());
 app.use("/api/url", urlRoutes);
 app.use("/api/payment", payemntRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 export default app;
