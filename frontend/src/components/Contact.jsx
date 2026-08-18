@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 // --- Animation Variants ---
 const fadeUp = {
@@ -60,10 +61,38 @@ const contactLinks = [
 ];
 
 export default function ContactPage() {
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    alert("Thanks for your feedback!");
+    setIsSubmitting(true);
+    setStatusMessage("");
+
+    // Gather form data
+    const formData = {
+      name: e.target.name.value,
+      email: e.target.email.value,
+      message: e.target.message.value,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:3000/api/feedback/send-feedback", formData);
+
+      if (response.data.success) {
+        setStatusMessage("Thanks for your feedback! Check your email.");
+        e.target.reset(); // Clear the form
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      
+      // Axios puts backend error messages inside error.response.data
+      setStatusMessage(
+        error.response?.data?.error || "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -168,8 +197,15 @@ export default function ContactPage() {
                   type="submit"
                   className="w-full bg-white text-black font-medium py-3 px-4 rounded-xl hover:bg-blue-500 hover:text-white transition-colors"
                 >
-                  Send Message
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </motion.button>
+
+                {/* Status Message Display */}
+                {statusMessage && (
+                  <p className={`text-sm text-center mt-4 ${statusMessage.includes("error") || statusMessage.includes("wrong") ? "text-red-400" : "text-green-400"}`}>
+                    {statusMessage}
+                  </p>
+                )}
               </form>
             </div>
           </motion.div>
