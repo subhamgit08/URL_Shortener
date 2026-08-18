@@ -1,5 +1,6 @@
 import { getAuth } from "@clerk/express";
 import User from "../models/user.js";
+import redisClient from "../config/redis.js";
 
 export const getUserPlan = async (req, res) => {
   try {
