@@ -12,6 +12,7 @@ import payemntRoutes from "./routes/payment_routes.js";
 import webhookRoutes from "./routes/webHooks_routes.js";
 import userRoutes from "./routes/user_routes.js";
 import feedbackRoutes from "./routes/feedback.js";
+import adminRoutes from "./routes/admin_routes.js";
 
 const app = express();
 
@@ -55,5 +56,6 @@ app.use("/api/url", urlRoutes);
 app.use("/api/payment", payemntRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api/admin", adminRoutes);
 
 export default app;

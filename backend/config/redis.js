@@ -2,8 +2,11 @@ import { createClient } from 'redis';
 
 // Initialize the client using the Render Internal URL stored in your environment variables
 const redisClient = createClient({
-    url: process.env.REDIS_URL
+    url: process.env.REDIS_URL || "redis://localhost:6379",
+    password: "1234"
 });
+
+export const redisSubscriber = redisClient.duplicate();
 
 // Event listeners to monitor the connection status
 redisClient.on('error', (err) => {
@@ -20,5 +23,6 @@ redisClient.on('reconnecting', () => {
 
 // Connect immediately when the backend starts up
 await redisClient.connect();
+await redisSubscriber.connect();
 
 export default redisClient;

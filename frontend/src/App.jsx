@@ -10,6 +10,7 @@ import AboutPage from './components/About';
 import ContactPage from './components/Contact';
 import HomePage from './components/Home';
 import Pricing from './components/Pricing';
+import AdminDashboard from './components/AdminDashboard';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/url-shortener" element={<UrlShortener />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
     </KineticGrid>
   )

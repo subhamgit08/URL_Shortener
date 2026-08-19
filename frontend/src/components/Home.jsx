@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Show, SignUpButton } from "@clerk/react";
+import { Show, SignUpButton, useUser } from "@clerk/react";
 import { Link } from "react-router-dom";
 
 // --- Animation Variants ---
@@ -77,6 +77,10 @@ const testimonials = [
 export default function HomePage() {
     const [url, setUrl] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user, isLoaded } = useUser();
+
+    const userEmail = user?.primaryEmailAddress?.emailAddress;
+    const isAdmin = userEmail === "projectmail524@gmail.com";
 
     const handleShorten = (e) => {
         e.preventDefault();
@@ -163,6 +167,21 @@ export default function HomePage() {
                         </Link>
                     </motion.div>
                 </motion.section>
+
+                {/* --- Notifications Section --- */}
+                {/* {isLoaded && !isAdmin && (
+                    <motion.section
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-100px" }}
+                        variants={staggerContainer}
+                        className="py-16 border-t border-neutral-800/50"
+                    >
+                        <motion.div variants={fadeUp}>
+                            <NotificationCenter />
+                        </motion.div>
+                    </motion.section>
+                )} */}
 
                 {/* --- Features Section --- */}
                 <motion.section
