@@ -49,12 +49,12 @@ const collapsedIconVariants = {
 export function AnimatedNavFramer() {
   const [isExpanded, setExpanded] = React.useState(true);
   const [userPlan, setUserPlan] = React.useState("free");
-  
+
   // Notification & Socket States
   const [isSubscribed, setIsSubscribed] = React.useState(false);
   const [isNotifOpen, setIsNotifOpen] = React.useState(false);
   const [socket, setSocket] = React.useState(null);
-  
+
   const [notifications, setNotifications] = React.useState(() => {
     const saved = localStorage.getItem("saved_notifications");
     if (saved) {
@@ -62,7 +62,7 @@ export function AnimatedNavFramer() {
     }
     return [];
   });
-  
+
   const notifRef = React.useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_ENDPOINT || "http://localhost:3000";
 
@@ -95,14 +95,55 @@ export function AnimatedNavFramer() {
     }
   }, [socket, userEmail]);
 
-  const handleSubscribe = () => {
-    if (socket) socket.emit("subscribe_to_notifications", { email: userEmail || "Anonymous" });
-    localStorage.setItem("hasSubscribed", "true");
-    setIsSubscribed(true);
+  const handleSubscribe = async () => {
+    try {
+      const token = await getToken();
+
+      await axios.post(
+        `${backendUrl}/api/subscribe`,
+        {
+          email: userEmail
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      // Subscribe this socket to future admin notifications
+      socket?.emit("subscribe_to_notifications", {
+        userId: user?.id
+      });
+
+      localStorage.setItem("hasSubscribed", "true");
+      setIsSubscribed(true);
+
+      // Optional immediate UI notification
+      setNotifications((prev) => {
+        const updated = [
+          "You have successfully subscribed to notifications!",
+          ...prev
+        ].slice(0, 10);
+
+        localStorage.setItem(
+          "saved_notifications",
+          JSON.stringify(updated)
+        );
+
+        return updated;
+      });
+
+    } catch (error) {
+      console.error("Subscription failed:", error);
+    }
   };
 
   const handleUnsubscribe = () => {
-    if (socket) socket.emit("unsubscribe_from_notifications", { email: userEmail || "Anonymous" });
+    if (socket)
+      socket?.emit("unsubscribe_from_notifications", {
+        userId: user?.id
+      });
     localStorage.removeItem("hasSubscribed");
     setIsSubscribed(false);
   };
@@ -216,7 +257,7 @@ export function AnimatedNavFramer() {
 
       {/* RIGHT CONTROLS: Notification + User Auth */}
       <div className="flex-1 flex justify-end items-center gap-2 sm:gap-3 pointer-events-auto" ref={notifRef}>
-        
+
         {/* NOTIFICATION POPOVER TRIGGER */}
         <div className="relative">
           {isSubscribed ? (
@@ -228,7 +269,7 @@ export function AnimatedNavFramer() {
             >
               <Bell className="h-5 w-5" />
               {notifications.length > 0 && (
-                 <span className="absolute top-3.5 right-3.5 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                <span className="absolute top-3.5 right-3.5 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
               )}
             </motion.button>
           ) : (
@@ -253,7 +294,7 @@ export function AnimatedNavFramer() {
                 transition={{ duration: 0.2 }}
                 className="absolute top-14 right-0 w-80 sm:w-96 bg-neutral-900/90 backdrop-blur-2xl border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right"
               >
-                <NotificationCenter 
+                <NotificationCenter
                   onClose={() => setIsNotifOpen(false)}
                   isSubscribed={isSubscribed}
                   onSubscribe={handleSubscribe}

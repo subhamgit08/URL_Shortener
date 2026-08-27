@@ -1,5 +1,5 @@
 import URL from "../models/urlSchema.js";
-import { getAuth, requireAuth } from "@clerk/express";
+import { getAuth } from "@clerk/express";
 import { encodeBase62 } from "../utils/Base62Converter.js";
 import Counter from "../config/Counter.js";
 import redisClient from "../config/redis.js";

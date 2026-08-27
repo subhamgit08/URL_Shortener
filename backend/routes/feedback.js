@@ -16,9 +16,7 @@ router.post("/send-feedback", async (req,res)=>{
         res.status(401).json({ success: false, error: "Fields are required" });
     }
 
-  // IMPORTANT: The email you verified in Mailjet
   const verifiedSenderEmail = "subhamdasexampurpose@gmail.com"; 
-  // Where you want to receive the portfolio messages
   const yourPersonalEmail = "2024csb023.subham@students.iiests.ac.in"; 
 
   try {

@@ -6,9 +6,10 @@ import http from "http";
 import { Server } from "socket.io";
 
 import app from "./app.js";
-import {connectDB} from "./config/mongoDB.js";
+import { connectDB } from "./config/mongoDB.js";
 import { syncClicksToDatabase } from './controllers/clickSyncer.js';
 import { redisSubscriber } from "./config/redis.js";
+import { initializeSocket } from './config/socket.js';
 
 const server = http.createServer(app);
 
@@ -20,18 +21,38 @@ const io = new Server(server, {
   },
 });
 
+initializeSocket(io);
+
 // 1. Handle Browser WebSocket connections
 io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
 
-  // When a user clicks "Subscribe" on the frontend
-  socket.on("subscribe_to_notifications", () => {
-    socket.join("subscribers_room"); // Add them to a specific room
-    console.log(`User ${socket.id} subscribed!`);
+  socket.on("subscribe_to_notifications", ({ userId }) => {
+
+    // Common room for admin announcements
+    socket.join("subscribers_room");
+
+    // Personal room for user-specific notifications
+    if (userId) {
+      socket.join(`user:${userId}`);
+    }
+
+    console.log(
+      `User ${socket.id} subscribed` +
+      (userId ? ` | user:${userId}` : "")
+    );
   });
 
-  socket.on("unsubscribe_from_notifications", () => {
-    socket.leave("subscribers_room"); // Takes them out of the room
+  socket.on("unsubscribe_from_notifications", ({ userId }) => {
+
+    // Leave common subscriber room
+    socket.leave("subscribers_room");
+
+    // Leave personal room
+    if (userId) {
+      socket.leave(`user:${userId}`);
+    }
+
     console.log(`User ${socket.id} unsubscribed`);
   });
 });
@@ -47,20 +68,20 @@ const PORT = process.env.PORT || 3000;
 
 
 const startServer = async () => {
-    try {
-        await connectDB();
+  try {
+    await connectDB();
 
-        setInterval(syncClicksToDatabase, 5 * 60 * 1000);
+    setInterval(syncClicksToDatabase, 5 * 60 * 1000);
 
-        server.listen(PORT, () => {
-            console.log(`🚀 Server + Socket.IO running on http://localhost:${PORT}`);
-        });
-    }
-    catch (err) {
-        console.error("Failed to start server");
-        console.error(err.message);
-        process.exit(1);
-    }
+    server.listen(PORT, () => {
+      console.log(`🚀 Server + Socket.IO running on http://localhost:${PORT}`);
+    });
+  }
+  catch (err) {
+    console.error("Failed to start server");
+    console.error(err.message);
+    process.exit(1);
+  }
 };
 
 startServer();
