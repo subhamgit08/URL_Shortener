@@ -2,6 +2,7 @@ import { Router } from "express";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import User from "../models/user.js";
+import { notificationQueue } from "../config/queue.js";
 
 const router = Router();
 
@@ -94,6 +95,12 @@ router.post("/verify-payment", async (req, res) => {
         return res.status(404).json({ error: "User not found in database" });
       }
 
+      await notificationQueue.add({
+        type: "SUBSCRIPTION_UPGRADED",
+        clerkId: clerkId,
+        plan: plan
+      });
+
       return res.status(200).json({ 
         success: true, 
         message: `Successfully upgraded to ${plan} plan!`,
@@ -138,6 +145,11 @@ router.post("/set-free-plan", async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    await notificationQueue.add({
+      type: "SUBSCRIPTION_CANCELED",
+      clerkId: clerkId
+    });
 
     return res.status(200).json({ 
       success: true, 

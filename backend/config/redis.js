@@ -1,27 +1,38 @@
-import { createClient } from 'redis';
+import dotenv from "dotenv";
+dotenv.config();
 
-// Initialize the client using the Render Internal URL stored in your environment variables
-const redisClient = createClient({
-    url: process.env.REDIS_URL || "redis://localhost:6379",
-    password: "1234"
-});
+import { createClient } from "redis";
+
+let redisClient;
+
+if (process.env.MODE === "production") {
+    // Render Redis
+    redisClient = createClient({
+        url: process.env.REDIS_URL,
+    });
+} else {
+    // Local Redis
+    redisClient = createClient({
+        url: process.env.REDIS_EXTERNAL_URL
+    });
+}
 
 export const redisSubscriber = redisClient.duplicate();
 
-// Event listeners to monitor the connection status
-redisClient.on('error', (err) => {
-    console.error('Redis connection error:', err);
+
+
+redisClient.on("error", (err) => {
+    console.error("Redis connection error:", err);
 });
 
-redisClient.on('connect', () => {
-    console.log('Successfully connected to Redis');
+redisClient.on("connect", () => {
+    console.log("Successfully connected to Redis");
 });
 
-redisClient.on('reconnecting', () => {
-    console.log('Reconnecting to Redis...');
+redisClient.on("reconnecting", () => {
+    console.log("Reconnecting to Redis...");
 });
 
-// Connect immediately when the backend starts up
 await redisClient.connect();
 await redisSubscriber.connect();
 
