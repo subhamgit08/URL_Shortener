@@ -210,15 +210,7 @@ Express Backend
 - Add detailed analytics such as referrer, device, browser, country, and time-series click graphs.
 - Add QR code generation for every short URL.
 - Add link expiration dates and password-protected links.
-- Add abuse detection for spam, malware, phishing, and suspicious redirect destinations.
-- Add database indexes for faster lookup on `shortCode`, `userId`, and common dashboard queries.
-- Add API keys so premium users can create short URLs from external applications.
 - Add retry, dead-letter, and monitoring support for BullMQ jobs.
-- Add automated tests for URL creation, redirect behavior, payment verification, and webhook handling.
-- Add Docker Compose for local MongoDB, Redis, backend, frontend, and workers.
-- Add deployment documentation for frontend, backend, Redis, MongoDB, workers, and environment variables.
-- Add cache invalidation support when URLs are edited or deleted.
-- Add horizontal scaling support with multiple backend instances behind a load balancer.
 
 ## Conclusion
 
