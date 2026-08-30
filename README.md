@@ -1,6 +1,6 @@
 # Snap Shortener - Scalable URL Shortener ><a href="https://url-shortener-frontend-omega-sooty.vercel.app/"> 🚀 Live Demo </a>
 
-<table> <tr> <th>Home Page</th> <th>Shortener</th> <th>Payment Interface</th> </tr> <tr> <td width="33%"> <img src="https://url-shortener-s5p8.onrender.com/api/url/z" width="100%"> </td> <td width="33%"> <img src="https://github.com/user-attachments/assets/c8d7021d-076c-4c81-a103-2bfe6e8ee4e7" width="100%"> </td> <td width="33%"> <img src="https://github.com/user-attachments/assets/c44590cc-9a5c-4314-8c20-6fa0c6bc64ad" width="100%"> </td> </tr> </table>
+<table> <tr> <th>Home Page</th> <th>Shortener</th> <th>Payment Interface</th> </tr> <tr> <td width="33%"> <img src="https://github.com/user-attachments/assets/e45457a3-f5e9-42b5-a046-99624817ee55" width="100%"> </td> <td width="33%"> <img src="https://github.com/user-attachments/assets/c8d7021d-076c-4c81-a103-2bfe6e8ee4e7" width="100%"> </td> <td width="33%"> <img src="https://github.com/user-attachments/assets/c44590cc-9a5c-4314-8c20-6fa0c6bc64ad" width="100%"> </td> </tr> </table>
 
 Snap Shortener is a full-stack URL shortening platform built with React, Node.js, Express, MongoDB, Redis, Clerk authentication, Socket.IO, BullMQ, Mailjet, and Razorpay. The project is designed around a common system-design problem: converting long, hard-to-share URLs into short, reliable, trackable links that can handle high read traffic.
 
